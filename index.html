@@ -1,0 +1,151 @@
+<html>
+  <head>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .zoomOnHover {
+        margin-top: 250px;
+        margin-left: 150px;
+        width: 630px;
+        height: 300px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid grey;
+      }
+
+      .zoomOnHover img {
+        width: 800px;
+        height: 300px;
+        position: absolute;
+        left: -90px;
+      }
+    </style>
+  </head>
+  <body>
+
+  <div class="zoomOnHover">
+    <img src="cm997hae_2.png" />
+  </div>
+  
+
+    <script>
+
+      function isValidObject(settings) {
+        return !(settings === null || Object.keys(settings).length === 0 || typeof settings !== 'object');
+      }
+
+      function createDOMElems(zoomImg) {
+
+        const newDiv = document.createElement('div');
+        const newImg = new Image();
+        
+        newDiv.className = "zoom";
+        newImg.src = zoomImg.src;
+
+        setStyleToElem(newDiv, {
+          position: "absolute",
+          width: "500px",
+          height: "500px",
+          boxShadow: "-2px 0px 57px -28px rgba(0,0,0,0.95)",
+          left: "800px",
+          top: "150px",
+          overflow:" hidden",
+          display: "none"
+        });
+
+        setStyleToElem(newImg, {
+          position: "absolute",
+          top: "-40px"
+        })
+        
+        newDiv.appendChild(newImg);
+        document.body.appendChild(newDiv);
+        
+        return [newDiv, newImg];
+      }
+
+      function setStyleToElem(elem, objStyle) {
+        if (!(isValidObject(objStyle)))
+          throw new Error('Arguments objStyle is not an Object or is empty');
+
+        Object.assign(elem.style, objStyle);
+      }
+
+      function calculateSizes(img) {
+        
+        const imgWidth = img.offsetWidth;
+        const imgHeight = img.offsetHeight;
+        const ratio = Math.floor(imgWidth / imgHeight);
+
+        return ratio;
+      }
+
+      function calculatePosition(e, ratio) {
+
+        const boxWidth = this.clientWidth,
+        xPos = e.pageX - this.offsetLeft,
+        yPos = e.pageY - this.offsetTop;
+        
+        return [xPos*ratio, yPos];
+      }
+
+      function mouseOnImage(zoomDiv, zoomingDiv, zoomingImg) {
+
+        zoomDiv.onmousemove = function(e) {
+
+          const ratio = calculateSizes(zoomDiv.firstElementChild);
+          const [xPos, yPos] = calculatePosition.call(this, e, ratio);
+
+          setStyleToElem(zoomingDiv, {
+            display: "block"
+          });
+
+          setStyleToElem(zoomingImg, {
+            top: (-yPos+100) + "px",
+            left: (-xPos) + "px"
+          });
+        }
+
+      }
+
+      function mosueOffImage(zoomDiv, zoomingDiv, zoomingImg) {
+        zoomDiv.onmouseleave  = function(e) {
+          setStyleToElem(zoomingImg, {
+            position: "absolute",
+            top: "-60px"
+          });
+
+          setStyleToElem(zoomingDiv, {
+            display: "none"
+          });
+
+        }
+      }
+
+      function zoomOnHover() {
+
+        window.addEventListener('load', atachZoom);
+
+      }
+
+      function atachZoom() {
+
+        const zoomDiv = document.querySelector('.zoomOnHover');
+        const zoomImg = zoomDiv.querySelector('img');
+
+        const [zoomingDiv, zoomingImg] = createDOMElems(zoomImg);
+
+        mouseOnImage(zoomDiv, zoomingDiv, zoomingImg);
+        mosueOffImage(zoomDiv, zoomingDiv, zoomingImg);
+      }
+
+
+      zoomOnHover();
+      
+
+    </script>
+  </body>
+</html>
